@@ -30,7 +30,7 @@ li {
 /**时间选择插件样式**/
 .date-box{
     position: absolute;
-    top: 0;
+    top: 100px;
     left: 0;
     width: 220px;
     border:2px solid green;
@@ -64,14 +64,21 @@ li {
     border-radius: 50%;
     /*background-color: blue;*/
 }
-.date-body .active{
+.date-body .active,
+.date-body .active:hover{
     background-color: green;
 }
 .date-body li:hover{
     background-color: blue;
+    cursor: pointer;
 }
 .date-footer li{
     float: left;
+}
+.date-pre:hover,
+.date-next:hover,
+.date-footer li:hover{
+    cursor: pointer;
 }
 .date-header,
 .date-day,
