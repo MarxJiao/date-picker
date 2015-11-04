@@ -1,0 +1,96 @@
+/**全局属性**/
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+form,
+button,
+input,
+textarea,
+th,
+td,
+button {
+    margin: 0;
+    padding: 0;
+    outline: none;
+}
+li {
+    list-style-type: none;
+}
+/**时间选择插件样式**/
+.date-box{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 220px;
+    border:2px solid green;
+}
+.date-box li{
+    float: left;
+    text-align: center;
+    line-height: 30px;
+}
+.date-pre,
+.date-next{
+    width: 30px;
+    height: 30px;
+}
+.date-month{
+    width: 60px;
+    padding: 0 0 0 15px;
+}
+.date-year{
+    width: 60px;
+    padding: 0 15px 0 0;
+}
+.date-header li{
+    color: white;
+}
+.date-day li,
+.date-body li{
+    float: left;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    /*background-color: blue;*/
+}
+.date-body .active{
+    background-color: green;
+}
+.date-body li:hover{
+    background-color: blue;
+}
+.date-footer li{
+    float: left;
+}
+.date-header,
+.date-day,
+.date-body,
+.date-footer{
+    clear: both;
+    padding:5px;
+}
+.date-header{
+    height: 30px;
+    background-color: green;
+}
+.date-clear{
+    width: 50px;
+}
+.date-today{
+    width: 50px;
+    margin:0 30px;
+}
+.date-close{
+    width: 50px;
+}
