@@ -9,10 +9,38 @@
         this.year = this.activeDate.getFullYear();
         this.month = this.activeDate.getMonth();
         this.day = this.activeDate.getDate();
+        this.inputX = this.target.offset().top;
+        this.inputY = this.target.offset().left;
+        this.inputH = this.target.outerHeight();
+        this.dateHolder = '<div class="date-holder"></div>';
         this.init();
     }
     DatePicker.prototype = {
-        init: function () {},
+
+        /**
+         * 初始化时间插件
+         */
+        init: function () {
+            this.getPosition();
+            this.target.on('focus', function () {
+                var hasDateBox = $(this).next('.date-holder').is(':visible');
+                if (!hasDateBox) {
+                    $(this).next('.date-holder').html(this.getCalendar(this.activeDate)).show();
+                }
+            });
+        },
+
+        /**
+         * 设置日期框的位置
+         *
+         * @param {number} x 日期框对应文本框的offsetTop值
+         * @param {number} y 日期框对应文本框的offsetLeft值
+         */
+        getPosition: function () {
+            this.target.after(this.dateHolder);
+            this.target.next('.date-holder').css({top: this.inputX + this.inputH, left: this.inputY});
+            this.target.next('.date-holder').hide;
+        },
 
         /**
          * 获取给定年月的当月总天数
@@ -48,18 +76,18 @@
          * @return {string} 给定日期的日期选择控件的Dom结构字符串
          */
         getCalendar: function (showDate) {
-            year = showDate.getFullYear();
-            month = showDate.getMonth();
-            day = showDate.getDate();
-            var emptyDays = getDayOfFirstDate(year, month);
-            var daysOfMonth = getDaysOfMonth(year, month);
+            this.year = showDate.getFullYear();
+            this.month = showDate.getMonth();
+            this.day = showDate.getDate();
+            var emptyDays = this.getDayOfFirstDate(this.year, this.month);
+            var daysOfMonth = this.getDaysOfMonth(this.year, this.month);
             var calendarDom = ''
                 + '<div class="date-box">'
                 +     '<div class="date-header">'
                 +         '<ul>'
                 +             '<li class="date-pre"><</li>'
-                +             '<li class="date-month">' + (month + 1) + '月</li>'
-                +             '<li class="date-year">' + year + '年</li>'
+                +             '<li class="date-month">' + (this.month + 1) + '月</li>'
+                +             '<li class="date-year">' + this.year + '年</li>'
                 +             '<li class="date-next">></li>'
                 +         '</ul>'
                 +     '</div>'
@@ -80,15 +108,15 @@
                 calendarDom += '<li></li>';
             }
             for (var i = 1; i <= daysOfMonth; i++) {
-                if (i === day
-                    && activeDate.getFullYear() === showDate.getFullYear()
-                    && activeDate.getMonth() === showDate.getMonth()
-                    && activeDate.getDate() === showDate.getDate()
+                if (i === this.day
+                    && this.activeDate.getFullYear() === showDate.getFullYear()
+                    && this.activeDate.getMonth() === showDate.getMonth()
+                    && this.activeDate.getDate() === showDate.getDate()
                 ) {
-                    calendarDom += '<li class="active" data-date="' + year + '-' + month + '-' + i + '">' + i + '</li>';
+                    calendarDom += '<li class="active" data-date="' + this.year + '-' + this.month + '-' + i + '">' + i + '</li>';
                 }
                 else {
-                    calendarDom += '<li data-date="' + year + '-' + month + '-' + i + '">' + i + '</li>';
+                    calendarDom += '<li data-date="' + this.year + '-' + this.month + '-' + i + '">' + i + '</li>';
                 }
             }
             calendarDom += ''
@@ -119,13 +147,13 @@
          */
         clickToday: function () {
             $(document).on('click', '.date-today', function () {
-                activeDate = new Date();
-                year = activeDate.getFullYear();
-                month = activeDate.getMonth();
-                day = activeDate.getDate();
-                var printDate = [year, (month + 1), day].join('-');
+                this.activeDate = new Date();
+                this.year = this.activeDate.getFullYear();
+                this.month = this.activeDate.getMonth();
+                this.day = this.activeDate.getDate();
+                var printDate = [this.year, (this.month + 1), this.day].join('-');
                 $(this).parents('.date-holder').prev().val(printDate);
-                $(this).parents('.date-holder').html(getCalendar(activeDate));
+                $(this).parents('.date-holder').html(this.getCalendar(this.activeDate));
             });
         },
 
@@ -136,7 +164,7 @@
             $(document).on('click', '.date-clear', function () {
                 $(this).parents('.date-holder').prev().val('');
                 $(this).parents('.date-footer').siblings('.date-body').children().children().removeClass('active');
-                activeDate = new Date();
+                this.activeDate = new Date();
             });
         },
 
@@ -146,22 +174,22 @@
         pickDate: function () {
             $(document).on('click', '.date-body li', function () {
                 var pickedDate = $(this).attr('data-date');
-                activeDate = new Date(pickedDate.split('-')[0], pickedDate.split('-')[1], pickedDate.split('-')[2]);
+                this.activeDate = new Date(pickedDate.split('-')[0], pickedDate.split('-')[1], pickedDate.split('-')[2]);
                 $(this).addClass('active').siblings().removeClass('active');
                 var monthToShow = parseInt(pickedDate.split('-')[1], 10) + 1 + '';
                 var pickedDateShow = [pickedDate.split('-')[0], monthToShow, pickedDate.split('-')[2]].join('-');
                 $(this).parents('.date-holder').prev().val(pickedDateShow);
             });
         },
-        
+
         /**
          * 点击「<」日期框向前翻页
          */
         clickPreMonth: function () {
             $(document).on('click', '.date-pre', function () {
-                month--;
-                var preMonthDate = new Date(year, month, activeDate.getDate());
-                $(this).parents('.date-holder').html(getCalendar(preMonthDate));
+                this.month--;
+                var preMonthDate = new Date(this.year, this.month, this.activeDate.getDate());
+                $(this).parents('.date-holder').html(this.getCalendar(preMonthDate));
             });
         },
 
@@ -170,53 +198,34 @@
          */
         clickNextMonth: function () {
             $(document).on('click', '.date-next', function () {
-                month++;
-                var nextMonthDate = new Date(year, month, activeDate.getDate());
-                $(this).parents('.date-holder').html(getCalendar(nextMonthDate));
+                this.month++;
+                var nextMonthDate = new Date(this.year, this.month, this.activeDate.getDate());
+                $(this).parents('.date-holder').html(this.getCalendar(nextMonthDate));
             });
-        }
-        
-        
-    };
--------------------------------------------------------------------------------------
-    
-    
-
-    
-
-    
-
-    /**
-     * 定义插件名称
-     */
-    $.fn.datePicker = function () {
-        return new DatePicker($(this));
-
-        var inputX = $(this).offset().top;
-        var inputY = $(this).offset().left;
-        var inputH = $(this).outerHeight();
-        var dateHolder = '<div class="date-holder"></div>';
-        this.after(dateHolder);
-        $(this).next('.date-holder').css({top: inputX + inputH, left: inputY});
-        $(this).next('.date-holder').hide;
-        $(this).on('focus', function () {
-            var hasDateBox = $(this).next('.date-holder').is(':visible');
-            if (!hasDateBox) {
-                $(this).next('.date-holder').html(getCalendar(activeDate)).show();
-            }
-        });
+        },
 
         /**
          * 点击日期框以外的地方关闭日期框，点击内部和文本框阻止冒泡
          */
-        $(document).on('click', function () {
-            $('.date-holder').hide();
-        });
-        $(document).on('click', '.date-holder', function (event) {
-            event.stopPropagation();
-        });
-        $(this).on('click', function (event) {
-            event.stopPropagation();
-        });
+        stopClickPropagation: function () {
+            $(document).on('click', function () {
+                $('.date-holder').hide();
+            });
+            $(document).on('click', this.target, function (event) {
+                event.stopPropagation();
+            });
+            this.target.on('click', function (event) {
+                event.stopPropagation();
+            });
+        }
+    };
+
+    /**
+     * 定义插件名称
+     * 
+     * @return {Object} 当前插件的实例
+     */
+    $.fn.datePicker = function () {
+        return new DatePicker($(this));      
     };
 })(jQuery);
