@@ -21,11 +21,13 @@
          * 初始化时间插件
          */
         init: function () {
+            var _self = this;
+            console.log(_self.getCalendar);
             this.getPosition();
-            this.target.on('focus', function () {
+            this.target.on('focus', function (_self) {
                 var hasDateBox = $(this).next('.date-holder').is(':visible');
                 if (!hasDateBox) {
-                    $(this).next('.date-holder').html(this.getCalendar(this.activeDate)).show();
+                    $(this).next('.date-holder').html(_self.getCalendar(_self.activeDate)).show();
                 }
             });
         },
