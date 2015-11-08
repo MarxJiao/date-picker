@@ -1,24 +1,21 @@
 /**
  * @file datePicker.js - a jQuery plugin to pick date
  * @author jiaojian04
- *
- * Example：
- * HTML:
- * <input type="text" id="date">
- * JS:
- * $('#date').datePiker();
  */
 (function ($) {
     function DatePicker(target) {
         this.target = target;
         this.activeDate = new Date();
+        this.year = this.activeDate.getFullYear();
+        this.month = this.activeDate.getMonth();
+        this.day = this.activeDate.getDate();
         this.inputX = this.target.offset().top;
         this.inputY = this.target.offset().left;
         this.inputH = this.target.outerHeight();
         this.dateHolder = '<div class="date-holder"></div>';
         this.target.after(this.dateHolder);
         this.dateHolder = this.target.next();
-        this.init();
+        // this.init();
     }
     DatePicker.prototype = {
 
@@ -26,7 +23,6 @@
          * 初始化时间插件
          */
         init: function () {
-            this.getYearMonthDate(this.activeDate);
             this.getPosition();
             this.pickDate();
             this.clickInput();
@@ -36,6 +32,7 @@
             this.clickPreMonth();
             this.clickNextMonth();
             this.stopClickPropagation();
+            this.printLog();
         },
 
         /**
@@ -65,17 +62,6 @@
         },
 
         /**
-         * 获取给日期的年月日
-         *
-         * @param {Date} sourseDate 给定日期
-         */
-        getYearMonthDate: function (sourseDate) {
-            this.year = sourseDate.getFullYear();
-            this.month = sourseDate.getMonth();
-            this.day = sourseDate.getDate();
-        },
-
-        /**
          * 获取给定年月当月第一天是星期几
          *
          * @param {number} year 给定年份
@@ -94,7 +80,9 @@
          * @return {string} 给定日期的日期选择控件的Dom结构字符串
          */
         getCalendar: function (showDate) {
-            this.getYearMonthDate(showDate);
+            this.year = showDate.getFullYear();
+            this.month = showDate.getMonth();
+            this.day = showDate.getDate();
             var emptyDays = this.getDayOfFirstDate(this.year, this.month);
             var daysOfMonth = this.getDaysOfMonth(this.year, this.month);
             var calendarDom = ''
@@ -120,20 +108,19 @@
                 +     '</div>'
                 +     '<div class="date-body">'
                 +         '<ul>';
-            for (var j = 0; j < emptyDays; j++) {
+            for (var i = 0; i < emptyDays; i++) {
                 calendarDom += '<li></li>';
             }
             for (var i = 1; i <= daysOfMonth; i++) {
-                var dateData = 'data-date="' + this.year + '-' + (this.month + 1) + '-' + i + '"';
                 if (i === this.day
                     && this.activeDate.getFullYear() === showDate.getFullYear()
                     && this.activeDate.getMonth() === showDate.getMonth()
                     && this.activeDate.getDate() === showDate.getDate()
                 ) {
-                    calendarDom += '<li class="active" ' + dateData + '>' + i + '</li>';
+                    calendarDom += '<li class="active" data-date="' + this.year + '-' + this.month + '-' + i + '">' + i + '</li>';
                 }
                 else {
-                    calendarDom += '<li ' + dateData + '>' + i + '</li>';
+                    calendarDom += '<li data-date="' + this.year + '-' + this.month + '-' + i + '">' + i + '</li>';
                 }
             }
             calendarDom += ''
@@ -155,18 +142,7 @@
          */
         showCalendar: function () {
             var hasDateBox = this.dateHolder.is(':visible');
-            // 文本框中存在的数据
-            var dataInInput = this.target.val();
-            // 注意月份不能超过12，日期不能超过31
-            if (dataInInput.match(/^\d{1,4}-\d{1,2}-\d{1,2}$/)) {
-                this.activeDate = this.getRealDate(dataInInput);
-            }
-            else {
-                this.activeDate = new Date();
-            }
-            this.getYearMonthDate(this.activeDate);
             if (!hasDateBox) {
-                $('.date-holder').hide();
                 this.dateHolder.html(this.getCalendar(this.activeDate)).show();
             }
         },
@@ -197,9 +173,14 @@
             var pluginSelf = this;
             $(document).on('click', '.date-today', function () {
                 pluginSelf.activeDate = new Date();
-                var printDate = pluginSelf.getShowDate(pluginSelf.activeDate);
+                pluginSelf.year = pluginSelf.activeDate.getFullYear();
+                pluginSelf.month = pluginSelf.activeDate.getMonth();
+                pluginSelf.day = pluginSelf.activeDate.getDate();
+                var printDate = [pluginSelf.year, (pluginSelf.month + 1), pluginSelf.day].join('-');
                 $(this).parents('.date-holder').prev().val(printDate);
                 $(this).parents('.date-holder').html(pluginSelf.getCalendar(pluginSelf.activeDate));
+                // /////////////////////////////////////
+                pluginSelf.printLog();
             });
         },
 
@@ -222,9 +203,16 @@
             var pluginSelf = this;
             $(document).on('click', '.date-body li', function () {
                 var pickedDate = $(this).attr('data-date');
-                pluginSelf.activeDate = pluginSelf.getRealDate(pickedDate);
+                var pickedYear = pickedDate.split('-')[0];
+                var pickedMonth = pickedDate.split('-')[1];
+                var pickedDay = pickedDate.split('-')[2];
+                pluginSelf.activeDate = new Date(pickedYear, pickedMonth, pickedDay);
                 $(this).addClass('active').siblings().removeClass('active');
-                $(this).parents('.date-holder').prev().val(pickedDate);
+                var monthToShow = parseInt(pickedDate.split('-')[1], 10) + 1 + '';
+                var pickedDateShow = [pickedDate.split('-')[0], monthToShow, pickedDate.split('-')[2]].join('-');
+                $(this).parents('.date-holder').prev().val(pickedDateShow);
+                // ////////////////////////////////////////////
+                pluginSelf.printLog();
             });
         },
 
@@ -266,31 +254,8 @@
                 event.stopPropagation();
             });
         },
-
-        /**
-         * 给定Date型日期，获取显示日期
-         *
-         * @param {Date} realDate 给定日期
-         * @return {string} 显示的日期
-         */
-        getShowDate: function (realDate) {
-            var yearToShow = realDate.getFullYear() + '';
-            var monthToShow = realDate.getMonth() + 1 + '';
-            var dateToShow = realDate.getDate() + '';
-            return yearToShow + '-' + monthToShow + '-' + dateToShow;
-        },
-
-        /**
-         * 给定显示日期，获取Date型日期
-         *
-         * @param {string} showDate 给定日期
-         * @return {Date} Date型日期
-         */
-        getRealDate: function (showDate) {
-            var realYear = parseInt(showDate.split('-')[0], 10);
-            var realMonth = parseInt(showDate.split('-')[1], 10) - 1;
-            var realDay = parseInt(showDate.split('-')[2], 10);
-            return new Date(realYear, realMonth, realDay);
+        printLog: function () {
+            console.log(this.activeDate);
         }
     };
 
@@ -300,6 +265,7 @@
      * @return {Object} 当前插件的实例
      */
     $.fn.datePicker = function () {
-        return new DatePicker($(this));
+        var objDatePicker = new DatePicker($(this));
+        objDatePicker.init();
     };
 })(jQuery);

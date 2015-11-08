@@ -40,13 +40,13 @@ li {
 .date-box {
     position: absolute;
     width: 220px;
-    border: 2px solid #008000;
+    border: 2px solid #2baf2b;
 }
 
 .date-box li {
     float: left;
     text-align: center;
-    line-height: 1;
+    line-height: 30px;
 }
 
 .date-pre,
@@ -75,16 +75,15 @@ li {
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    /*background-color: blue;*/
 }
 
 .date-body .active,
 .date-body .active:hover {
-    background-color: #008000;
+    background-color: #2baf2b;
 }
 
 .date-body li:hover {
-    background-color: #00f;
+    background-color: #d0f8ce;
     cursor: pointer;
 }
 
@@ -108,7 +107,7 @@ li {
 
 .date-header {
     height: 30px;
-    background-color: #008000;
+    background-color: #2baf2b;
 }
 
 .date-clear {
