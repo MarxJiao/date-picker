@@ -1,12 +1,12 @@
 /**
- * @file datePicker.js - a jQuery plugin to pick date
+ * @file datePicker.js - a simple jQuery plugin to pick date
  * @author jiaojian04
  *
  * Example：
  * HTML:
- * <input type="text" id="date">
+ * <input type="text" id="date" readonly>
  * JS:
- * $('#date').datePiker();
+ * $('#date').datePicker();
  */
 (function ($) {
     function DatePicker(target) {
@@ -157,7 +157,6 @@
             var hasDateBox = this.dateHolder.is(':visible');
             // 文本框中存在的数据
             var dataInInput = this.target.val();
-            // 注意月份不能超过12，日期不能超过31
             if (dataInInput.match(/^\d{1,4}-\d{1,2}-\d{1,2}$/)) {
                 this.activeDate = this.getRealDate(dataInInput);
             }

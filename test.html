@@ -1,23 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 
 <head>
     <meta charset="utf-8">
-    <title>时间插件</title>
-    <link rel="stylesheet" type="text/css" href="css/date.css">
+    <title>时间插件单元测试</title>
+    <link rel="stylesheet" href="css/date.css">
+    <link rel="stylesheet" href="test/lib/jasmine.css">
 </head>
 
 <body>
     <div>
-        <input type="text" id="date1"style="margin:100px;height:30px">
-        <input type="text" id="date2" style="margin:100px;height:30px">
+        <input type="text" id="date1" readonly>
     </div>
     <script src="script/jquery-2.1.1.min.js"></script>
+    <!--source file-->
     <script src="datePicker.js"></script>
-    <script type="text/javascript">
-        $('#date1').datePicker();
-        $('#date2').datePicker();
-    </script>
+    <!--tests file-->
+    <script src="test/lib/jasmine.js"></script>
+    <script src="test/lib/jasmine-html.js"></script>
+    <script src="test/lib/boot.js"></script>
+    <script src="test/lib/jasmine-jquery.js"></script>
+    <script src="datePicker.spec.js"></script>
 </body>
 
 </html>
