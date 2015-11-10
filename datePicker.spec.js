@@ -31,6 +31,7 @@ describe('日期选择控件', function () {
     });
 
     it('getCalendar', function () {
+        objDateTest.activeDate = testDate;
         var calendarDom = objDateTest.getCalendar(testDate);
         expect($(calendarDom)).toContainElement('li.active');
     });
@@ -108,5 +109,9 @@ describe('日期选择控件', function () {
     it('getRealDate', function () {
         var realDate = objDateTest.getRealDate('2015-11-9');
         expect(realDate).toEqual(testDate);
+    });
+
+    afterEach(function () {
+        $('.date-close').click();
     });
 });

@@ -12,68 +12,6 @@
 (function ($) {
 
     /**
-     * 日期控件定位元素的Dom
-     *
-     * @const
-     * @type {string}
-     */
-    var DATE_HOLDER = '<div class="date-holder"></div>';
-
-    /**
-     * 日期控件头部Dom
-     *
-     * @const
-     * @type {string}
-     */
-    var CALENDAR_HEADER = ''
-        + '<div class="date-box">'
-        +     '<div class="date-header">'
-        +         '<ul>'
-        +             '<li class="date-pre"><</li>';
-
-    /**
-     * 日期控件星期标志部分Dom
-     *
-     * @const
-     * @type {string}
-     */
-    var CALENDAR_DAY = ''
-        +             '<li class="date-next">></li>'
-        +         '</ul>'
-        +     '</div>'
-        +     '<div class="date-day">'
-        +         '<ul>'
-        +             '<li>日</li>'
-        +             '<li>一</li>'
-        +             '<li>二</li>'
-        +             '<li>三</li>'
-        +             '<li>四</li>'
-        +             '<li>五</li>'
-        +             '<li>六</li>'
-        +         '</ul>'
-        +     '</div>'
-        +     '<div class="date-body">'
-        +         '<ul>';
-
-    /**
-     * 日期控件底部Dom
-     *
-     * @const
-     * @type {string}
-     */
-    var CALENDAR_FOOTER = ''
-        +         '</ul>'
-        +     '</div>'
-        +     '<div class="date-footer">'
-        +         '<ul>'
-        +             '<li class="date-clear">清空</li>'
-        +             '<li class="date-today">今天</li>'
-        +             '<li class="date-close">关闭</li>'
-        +         '</ul>'
-        +     '</div>'
-        +  '</div>';
-
-    /**
      * 时间选择类
      *
      * @class
@@ -82,48 +20,20 @@
     function DatePicker(target) {
 
         /**
-         * 控件中用到的jQuery对象
+         * 使用控件的jQuery对象
          *
          * @type {Object}
          * @private
          */
-        this.dom = {
-
-            /**
-             * 控件对应文本框的jQuery对象
-             *
-             * @type {Object}
-             * @private
-             */
-            target: target,
-
-            /**
-             * jQuery document对象
-             *
-             * @type {Object}
-             * @private
-             */
-            jQueryDocument: $(document)
-        };
-
-        // 将日期控件定位元素插入dom中
-        this.dom.target.after(DATE_HOLDER);
+        this.target = target;
 
         /**
-         * 日期控件定位元素的jQuery对象
+         * jQuery document对象
          *
          * @type {Object}
          * @private
          */
-        this.dom.dateHolder = this.dom.target.next();
-
-        /**
-         * 所有的日期控件定位元素的jQuery对象
-         *
-         * @type {Object}
-         * @private
-         */
-        this.dom.allDateHolders = $('.date-holder');
+        this.document = $(document);
 
         /**
          * 当前对象中记录的日期
@@ -139,7 +49,7 @@
          * @type {number}
          * @private
          */
-        this.inputX = this.dom.target.offset().top;
+        this.inputX = this.target.offset().top;
 
         /**
          * 记录调用日期插件的对象的水平位置
@@ -147,7 +57,7 @@
          * @type {number}
          * @private
          */
-        this.inputY = this.dom.target.offset().left;
+        this.inputY = this.target.offset().left;
 
         /**
          * 记录调用日期插件的对象的高度
@@ -155,7 +65,18 @@
          * @type {number}
          * @private
          */
-        this.inputH = this.dom.target.outerHeight();
+        this.inputH = this.target.outerHeight();
+
+        // 将日期控件定位元素插入dom中
+        this.target.after('<div class="date-holder"></div>');
+
+        /**
+         * 日期控件定位元素的jQuery对象
+         *
+         * @type {Object}
+         * @private
+         */
+        this.dateHolder = this.target.next();
 
         // 初始化时间插件
         this.init();
@@ -168,7 +89,14 @@
         init: function () {
             this.getYearMonthDate(this.activeDate);
             this.getPosition();
-            this.blindEvent();
+            this.pickDate();
+            this.clickInput();
+            this.clickClose();
+            this.clickToday();
+            this.clickClear();
+            this.clickPreMonth();
+            this.clickNextMonth();
+            this.stopClickPropagation();
         },
 
         /**
@@ -178,8 +106,8 @@
          * @param {number} y 日期框对应文本框的offsetLeft值
          */
         getPosition: function () {
-            this.dom.dateHolder.css({top: this.inputX + this.inputH, left: this.inputY});
-            this.dom.dateHolder.hide();
+            this.dateHolder.css({top: this.inputX + this.inputH, left: this.inputY});
+            this.dateHolder.hide();
         },
 
         /**
@@ -231,10 +159,28 @@
             var emptyDays = this.getDayOfFirstDate(this.year, this.month);
             var daysOfMonth = this.getDaysOfMonth(this.year, this.month);
             var calendarDom = ''
-                + CALENDAR_HEADER
-                + '<li class="date-month">' + (this.month + 1) + '月</li>'
-                + '<li class="date-year">' + this.year + '年</li>'
-                + CALENDAR_DAY;
+                + '<div class="date-box">'
+                +     '<div class="date-header">'
+                +         '<ul>'
+                +             '<li class="date-pre"><</li>'
+                +             '<li class="date-month">' + (this.month + 1) + '月</li>'
+                +             '<li class="date-year">' + this.year + '年</li>'
+                +             '<li class="date-next">></li>'
+                +         '</ul>'
+                +     '</div>'
+                +     '<div class="date-day">'
+                +         '<ul>'
+                +             '<li>日</li>'
+                +             '<li>一</li>'
+                +             '<li>二</li>'
+                +             '<li>三</li>'
+                +             '<li>四</li>'
+                +             '<li>五</li>'
+                +             '<li>六</li>'
+                +         '</ul>'
+                +     '</div>'
+                +     '<div class="date-body">'
+                +         '<ul>';
             for (var j = 0; j < emptyDays; j++) {
                 calendarDom += '<li></li>';
             }
@@ -251,7 +197,17 @@
                     calendarDom += '<li ' + dateData + '>' + i + '</li>';
                 }
             }
-            calendarDom += CALENDAR_FOOTER;
+            calendarDom += ''
+                +         '</ul>'
+                +     '</div>'
+                +     '<div class="date-footer">'
+                +         '<ul>'
+                +             '<li class="date-clear">清空</li>'
+                +             '<li class="date-today">今天</li>'
+                +             '<li class="date-close">关闭</li>'
+                +         '</ul>'
+                +     '</div>'
+                +  '</div>';
             return calendarDom;
         },
 
@@ -259,9 +215,9 @@
          * 显示日期框
          */
         showCalendar: function () {
-            var hasDateBox = this.dom.dateHolder.is(':visible');
+            var hasDateBox = this.dateHolder.is(':visible');
             // 文本框中存在的数据
-            var dataInInput = this.dom.target.val();
+            var dataInInput = this.target.val();
             if (dataInInput.match(/^\d{1,4}-\d{1,2}-\d{1,2}$/)) {
                 this.activeDate = this.getRealDate(dataInInput);
             }
@@ -270,9 +226,108 @@
             }
             this.getYearMonthDate(this.activeDate);
             if (!hasDateBox) {
-                this.dom.allDateHolders.hide();
-                this.dom.dateHolder.html(this.getCalendar(this.activeDate)).show();
+                $('.date-holder').hide();
+                this.dateHolder.html(this.getCalendar(this.activeDate)).show();
             }
+        },
+
+        /**
+         * 显示日期框
+         */
+        clickInput: function () {
+            var pluginSelf = this;
+            this.target.on('focus', function () {
+                pluginSelf.showCalendar();
+            });
+        },
+
+        /**
+         * 点击关闭隐藏日期框
+         */
+        clickClose: function () {
+            this.document.on('click', '.date-close', function () {
+                $(this).parents('.date-holder').hide();
+            });
+        },
+
+        /**
+         * 点击『今天』，选择当前日期
+         */
+        clickToday: function () {
+            var pluginSelf = this;
+            this.document.on('click', '.date-today', function () {
+                pluginSelf.activeDate = new Date();
+                var $this = $(this);
+                var printDate = pluginSelf.getShowDate(pluginSelf.activeDate);
+                $this.parents('.date-holder').prev().val(printDate);
+                $this.parents('.date-holder').html(pluginSelf.getCalendar(pluginSelf.activeDate));
+            });
+        },
+
+        /**
+         * 点击『清空』，清空日期数据
+         */
+        clickClear: function () {
+            var pluginSelf = this;
+            this.document.on('click', '.date-clear', function () {
+                var $this = $(this);
+                $this.parents('.date-holder').prev().val('');
+                $this.parents('.date-footer').siblings('.date-body').children().children().removeClass('active');
+                pluginSelf.activeDate = new Date();
+            });
+        },
+
+        /**
+         * 点击日期选择时间
+         */
+        pickDate: function () {
+            var pluginSelf = this;
+            this.document.on('click', '.date-body li', function () {
+                var pickedDate = $(this).attr('data-date');
+                var $this = $(this);
+                pluginSelf.activeDate = pluginSelf.getRealDate(pickedDate);
+                $this.addClass('active').siblings().removeClass('active');
+                $this.parents('.date-holder').prev().val(pickedDate);
+            });
+        },
+
+        /**
+         * 点击「<」日期框向前翻页
+         */
+        clickPreMonth: function () {
+            var pluginSelf = this;
+            this.document.on('click', '.date-pre', function () {
+                pluginSelf.month--;
+                var preMonthDate = new Date(pluginSelf.year, pluginSelf.month, pluginSelf.activeDate.getDate());
+                $(this).parents('.date-holder').html(pluginSelf.getCalendar(preMonthDate));
+            });
+        },
+
+        /**
+         * 点击「>」日期框向后翻页
+         */
+        clickNextMonth: function () {
+            var pluginSelf = this;
+            this.document.on('click', '.date-next', function () {
+                pluginSelf.month++;
+                var nextMonthDate = new Date(pluginSelf.year, pluginSelf.month, pluginSelf.activeDate.getDate());
+                $(this).parents('.date-holder').html(pluginSelf.getCalendar(nextMonthDate));
+            });
+        },
+
+        /**
+         * 点击日期框以外的地方关闭日期框，点击内部和文本框阻止冒泡
+         */
+        stopClickPropagation: function () {
+            this.document.on('click', function () {
+                $('.date-holder').hide();
+            });
+            this.document.on('click', '.date-holder', function (event) {
+                event.stopPropagation();
+            });
+            this.target.on('click', function (event) {
+                event.stopPropagation();
+            });
         },
 
         /**
@@ -299,74 +354,6 @@
             var realMonth = parseInt(showDate.split('-')[1], 10) - 1;
             var realDay = parseInt(showDate.split('-')[2], 10);
             return new Date(realYear, realMonth, realDay);
-        },
-
-        /**
-         * 事件绑定函数
-         */
-        blindEvent: function () {
-            var pluginSelf = this;
-
-            // 点击选择日期的文本框，显示日期控件
-            this.dom.target.on('focus', function () {
-                pluginSelf.showCalendar();
-            });
-
-            // 点击关闭，隐藏日期框
-            this.dom.jQueryDocument.on('click', '.date-close', function () {
-                $(this).parents('.date-holder').hide();
-            });
-
-            // 点击『今天』，选择当前日期
-            this.dom.jQueryDocument.on('click', '.date-today', function () {
-                pluginSelf.activeDate = new Date();
-                var printDate = pluginSelf.getShowDate(pluginSelf.activeDate);
-                var $this = $(this);
-                $this.parents('.date-holder').prev().val(printDate);
-                $this.parents('.date-holder').html(pluginSelf.getCalendar(pluginSelf.activeDate));
-            });
-
-            // 点击『清空』，清空日期数据
-            this.dom.jQueryDocument.on('click', '.date-clear', function () {
-                var $this = $(this);
-                $this.parents('.date-holder').prev().val('');
-                $this.parents('.date-footer').siblings('.date-body').children().children().removeClass('active');
-                pluginSelf.activeDate = new Date();
-            });
-
-            // 点击日期选择时间
-            this.dom.jQueryDocument.on('click', '.date-body li', function () {
-                var pickedDate = $(this).attr('data-date');
-                var $this = $(this);
-                pluginSelf.activeDate = pluginSelf.getRealDate(pickedDate);
-                $this.addClass('active').siblings().removeClass('active');
-                $this.parents('.date-holder').prev().val(pickedDate);
-            });
-
-            // 点击「<」日期框向前翻页
-            this.dom.jQueryDocument.on('click', '.date-pre', function () {
-                pluginSelf.month--;
-                var preMonthDate = new Date(pluginSelf.year, pluginSelf.month, pluginSelf.activeDate.getDate());
-                $(this).parents('.date-holder').html(pluginSelf.getCalendar(preMonthDate));
-            });
-
-            // 点击「>」日期框向后翻页
-            this.dom.jQueryDocument.on('click', '.date-next', function () {
-                pluginSelf.month++;
-                var nextMonthDate = new Date(pluginSelf.year, pluginSelf.month, pluginSelf.activeDate.getDate());
-                $(this).parents('.date-holder').html(pluginSelf.getCalendar(nextMonthDate));
-            });
-
-            // 点击日期框以外的地方关闭日期框，点击内部和文本框阻止冒泡
-            this.dom.jQueryDocument.on('click', function () {
-                pluginSelf.dom.allDateHolders.hide();
-            });
-            this.dom.jQueryDocument.on('click', '.date-holder', function (event) {
-                event.stopPropagation();
-            });
-            this.dom.target.on('click', function (event) {
-                event.stopPropagation();
-            });
         }
     };
 
