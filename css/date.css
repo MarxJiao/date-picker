@@ -46,6 +46,7 @@ li {
     position: absolute;
     width: 220px;
     border: 2px solid #2baf2b;
+    background-color: #fff;
 }
 
 /* 日期控件里面的元素 */

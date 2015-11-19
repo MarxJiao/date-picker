@@ -10,7 +10,7 @@ describe('日期选择控件', function () {
         expect($('.date-holder')).toExist();
     });
 
-    it('获取到正确的位置', function () {
+    it('控件放置到正确的位置', function () {
         expect($('.date-holder').css('top')).toEqual('19px');
         expect($('.date-holder').css('left')).toEqual('0px');
     });
@@ -19,8 +19,8 @@ describe('日期选择控件', function () {
         expect(objDateTest.getDaysOfMonth(2015, 1)).toEqual(28);
     });
 
-    it('getYearMonthDate', function () {
-        objDateTest.getYearMonthDate(testDate);
+    it('setYearMonthDate', function () {
+        objDateTest.setYearMonthDate(testDate);
         expect(objDateTest.year).toEqual(2015);
         expect(objDateTest.month).toEqual(10);
         expect(objDateTest.day).toEqual(9);
@@ -99,16 +99,6 @@ describe('日期选择控件', function () {
         objDateTest.showCalendar();
         $('.date-box').click();
         expect($('.date-box')[0]).toBeVisible();
-    });
-
-    it('getShowDate', function () {
-        var showDate = objDateTest.getShowDate(testDate);
-        expect(showDate).toEqual('2015-11-9');
-    });
-
-    it('getRealDate', function () {
-        var realDate = objDateTest.getRealDate('2015-11-9');
-        expect(realDate).toEqual(testDate);
     });
 
     afterEach(function () {

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>时间插件</title>
+    <link rel="stylesheet" href="css/date.css">
+    <link rel="stylesheet" href="test/lib/jasmine.css">
+    <style>
+        div input {
+            margin:200px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <input type="text" id="date1" readonly>
+    </div>
+    <div>
+        <input type="text" id="date2" readonly>
+    </div>
+    <script src="script/jquery-2.1.1.min.js"></script>
+    <!--source file-->
+    <script src="datePicker.js"></script>
+    <script>
+    $('#date1').datePicker();
+    $('#date2').datePicker();
+    </script>
+
+</body>
+</html>
