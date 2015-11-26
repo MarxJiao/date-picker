@@ -1,6 +1,6 @@
 /**
  * @file datePicker.js - a simple jQuery plugin to pick date
- * @author jiaojian04
+ * @author Marx
  *
  * 将date.css和datePicker.js引入页面
  * Example：
