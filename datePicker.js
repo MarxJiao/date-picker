@@ -5,9 +5,9 @@
  * 将date.css和datePicker.js引入页面
  * Example：
  * HTML:
- * <input type="text" id="date" readonly>
+ *     <input type="text" id="date" readonly>
  * JS:
- * $('#date').datePicker();
+ *     $('#date').datePicker();
  */
 (function ($) {
 

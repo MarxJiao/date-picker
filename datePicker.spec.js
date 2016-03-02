@@ -1,6 +1,6 @@
 /**
  * @file 日期选择插件单元测试
- * @author jiaojiano4
+ * @author Marx
  */
 describe('日期选择控件', function () {
     var objDateTest = $('#date1').datePicker();
